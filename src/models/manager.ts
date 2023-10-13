@@ -1,5 +1,6 @@
-import { Model, DataType, Table, Column, BelongsTo, ForeignKey } from "sequelize-typescript";
+import { Model, DataType, Table, Column, BelongsTo, ForeignKey, HasMany } from "sequelize-typescript";
 import { Account } from "./account";
+import { Notification } from "./notification";
 
 @Table({
     timestamps: false,
@@ -28,16 +29,22 @@ export class Manager extends Model {
     fullName!: string;
 
     @Column({
-        type: DataType.BOOLEAN,
+        type: DataType.STRING,
         allowNull: false
     })
-    male!: boolean;
+    gender!: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: false
     })
     email!: string;
+
+    @Column({
+        type: DataType.DATE,
+        allowNull: false
+    })
+    birthday!: Date;
 
     @Column({
         type: DataType.STRING,
@@ -60,4 +67,7 @@ export class Manager extends Model {
   
     @BelongsTo(() => Account)
     account!: Account;
+
+    @HasMany(() => Notification)
+    notification!: Notification[];
 }

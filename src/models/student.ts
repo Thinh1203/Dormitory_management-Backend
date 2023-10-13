@@ -1,6 +1,11 @@
-import { Model, DataType, Table, Column, HasMany, BelongsTo, ForeignKey } from "sequelize-typescript";
+import { Model, DataType, Table, Column, HasMany, HasOne, BelongsTo, ForeignKey, BelongsToMany } from "sequelize-typescript";
 import { Account } from "./account";
 import { Rule } from "./rule";
+import { CheckOut } from "./checkout";
+import { RepairRequestForm } from "./repairrequestform";
+import { Room } from "./room";
+import { RoomStudent } from "./roomstudent";
+import { RegistrationForm } from "./registrationform";
 
 @Table({
     timestamps: false,
@@ -20,6 +25,12 @@ export class Student extends Model {
         type: DataType.STRING,
         allowNull: false
     })
+    avatar!: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false
+    })
     mssv!: string;
 
     @Column({
@@ -29,10 +40,10 @@ export class Student extends Model {
     fullName!: string;
 
     @Column({
-        type: DataType.BOOLEAN,
+        type: DataType.STRING,
         allowNull: false
     })
-    male!: boolean;
+    gender!: string;
 
     @Column({
         type: DataType.STRING,
@@ -62,7 +73,13 @@ export class Student extends Model {
         type: DataType.STRING,
         allowNull: false
     })
-    class!: string;
+    classs!: string;
+
+    @Column({
+        type: DataType.DATE,
+        allowNull: false
+    })
+    birthday!: Date;
 
     @Column({
         type: DataType.STRING,
@@ -99,4 +116,17 @@ export class Student extends Model {
 
     @HasMany(() => Rule)
     rule!: Rule[];
+
+    @HasMany(() => RepairRequestForm)
+    repairrequestform!: RepairRequestForm[];
+
+    @HasMany(() => RegistrationForm)
+    registrationform!: RegistrationForm[]
+
+    @HasOne(() => CheckOut)
+    checkOut!: CheckOut;
+
+    @BelongsToMany(() => Room, () => RoomStudent)
+    room!: Room[];
+
 }

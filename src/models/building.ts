@@ -1,11 +1,12 @@
-import { Model, DataType, Table, Column } from "sequelize-typescript";
+import { Model, DataType, Table, Column, HasMany } from "sequelize-typescript";
+import { Room } from "./room";
 
 @Table({
     timestamps: false,
-    tableName: "accounts"
+    tableName: "buildings"
 })
 
-export class Account extends Model {
+export class Building extends Model {
     @Column({
         type: DataType.INTEGER,
         primaryKey: true,
@@ -18,17 +19,15 @@ export class Account extends Model {
         type: DataType.STRING,
         allowNull: false
     })
-    userName!: string;
+    area!: number;
 
     @Column({
         type: DataType.STRING,
         allowNull: false
     })
-    password!: string;
+    areaCode!: string;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    role!: string;
+    @HasMany(() => Room)
+    room!: Room[];
+    
 }

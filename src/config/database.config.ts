@@ -5,6 +5,18 @@ import { Account } from "../models/account";
 import { Student } from "../models/student";
 import { Rule } from "../models/rule";
 import { Manager } from "../models/manager"; 
+import { Notification } from "../models/notification";
+import { CheckOut } from "../models/checkout";
+import { Building } from "../models/building";
+import { Room } from "../models/room";
+import { ElectricityAndWater } from "../models/electricityandwater";
+import { Receipt } from "../models/receipt";
+import { ListOfDevice } from "../models/listofdevices";
+import { RepairRequestForm } from "../models/repairrequestform";
+import { RequestList } from "../models/requestlist";
+import { RoomStudent } from "../models/roomstudent";
+import { SchoolYear } from "../models/schoolyear";
+import { RegistrationForm } from "../models/registrationform";
 
 const database: any = process.env.DATABASE;
 const username: any = process.env.USER;
@@ -15,7 +27,7 @@ const db = new Sequelize(database, username, password, {
     dialect: 'mysql',
     logging: false,
     // models: [],
-    // timezone: '+00:00',
+    timezone: '+07:00',
     define: {
         timestamps: true,
         underscored: true,
@@ -29,7 +41,24 @@ const db = new Sequelize(database, username, password, {
         acquire: 30000,
         idle: 10000,
     },
-    models: [Account, Student, Rule, Manager]
+    models: [
+        Account, 
+        Student, 
+        Rule, 
+        Manager, 
+        Notification, 
+        CheckOut, 
+        Building, 
+        Room, 
+        ElectricityAndWater, 
+        Receipt,
+        ListOfDevice,
+        RepairRequestForm,
+        RequestList,
+        RoomStudent,
+        SchoolYear,
+        RegistrationForm
+    ]
 });
 
 db.sync({ alter: true })
@@ -38,7 +67,7 @@ db.sync({ alter: true })
     })
     .catch((err) => {
         console.error("Unable to connect to the Database:", err);
-    });;
+    });
 
 export default db;
 
