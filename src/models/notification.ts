@@ -2,7 +2,7 @@ import { Model, DataType, Table, Column, BelongsTo, ForeignKey } from "sequelize
 import { Manager } from "./manager";
 
 @Table({
-    timestamps: false,
+    timestamps: true,
     tableName: "notifications"
 })
 

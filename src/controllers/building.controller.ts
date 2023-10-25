@@ -20,8 +20,7 @@ export const getOneBuilding = async (req: Request, res: Response, next: NextFunc
 };
 export const updateBuilding = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const { area, areaCode } = req.body;
-    const rs = await buildingService.updateBuilding(Number(id), { area, areaCode });
+    const rs = await buildingService.updateBuilding(Number(id), req.body);
     return isError(rs) ? next(err(rs, res)) : res.json(rs);
 };
 export const deleteBuilding = async (req: Request, res: Response, next: NextFunction) => {

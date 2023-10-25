@@ -34,6 +34,7 @@ interface UserStudent {
     numberPhone: string;
     address: string;
     identificationNumber: string;
+    major: string;
     classs: string;
     course: string;
     relativeName: string;
@@ -97,6 +98,7 @@ export const findOneByAccount = async (userName: string): Promise<ErrorInterface
 }
 
 export const findOneByUser = async (id: number) => {
+
     let userManager = await userManagerRepository.findOne({ where: { accountId: id } });
     let userStudent;
     if (userManager) return userManager;
@@ -125,7 +127,7 @@ export const updateManagerInformation = async (data: InformationUpdate, id: numb
     return (result[0] > 0) ? success() : failed();
 }
 
-export const createNewStudent = async ({ mssv, fullName, gender, password, email, numberPhone, address, identificationNumber, classs, course, relativeName, relativeNumberPhone, birthday, relationship }: StudentAccount, avatar: string) => {
+export const createNewStudent = async ({ mssv, fullName, gender, password, email, numberPhone, address, identificationNumber, classs, course, relativeName, relativeNumberPhone, birthday, relationship, major }: StudentAccount, avatar: string) => {
     const mssvExists = await userStudentRepository.findOne({ where: { mssv } });
     if (mssvExists) return BadRequestError("User already exists!");
 
@@ -155,6 +157,7 @@ export const createNewStudent = async ({ mssv, fullName, gender, password, email
         birthday,
         numberPhone,
         address,
+        major,
         classs,
         course,
         identificationNumber,
@@ -172,9 +175,37 @@ export const getOneStudent = async (id: number): Promise<ErrorInterface | Studen
     return findUser ? findUser : BadRequestError("User not found!");
 }
 
-export const getAllStudent = async () => {
-    const listStudent = await userStudentRepository.findAll({ attributes: { exclude: ['accountId'] } });
-    return listStudent ? listStudent : BadRequestError("Empty!");
+export const getAllStudent = async (limit: number, page: number, search: string | undefined = undefined) => {
+    const offset = ((page ? page : 1) - 1) * limit;
+ 
+    
+    const whereConditions: {
+        [key: string]: any;
+    } = {
+        [Op.or]: [
+            { mssv: { [Op.substring]: search } },
+            { fullName: { [Op.substring]: search } }
+        ]
+    };
+    const queryOptions: any = {
+        where: whereConditions,
+        offset: offset,
+        limit: limit,
+    };
+    const { count, rows } = await userStudentRepository.findAndCountAll(queryOptions);
+    const last_page = Math.ceil(count / limit);
+    const prev_page = page - 1 < 1 ? null : page - 1;
+    const next_page = page + 1 > last_page ? null : page +1;
+    return count > 0 ? {
+        current_page: page,
+        prev_page,
+        next_page,
+        last_page,
+        data_per_page: limit,
+        total: count,
+        ...(search !== undefined && search !== "" && search !== null && { search_query: search }),
+        data: rows
+    } : BadRequestError("Empty!");
 }
 
 export const updateStudentInformation = async (id: number, data: any) => {

@@ -33,16 +33,17 @@ export class Room extends Model {
     roomType!: string;
 
     @Column({
-        type: DataType.BOOLEAN,
-        allowNull: false
-    })
-    roomMale!: boolean;
-
-    @Column({
         type: DataType.STRING,
         allowNull: false
     })
-    status!: string;
+    roomMale!: string;
+
+    @Column({
+        type: DataType.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+    })
+    status!: boolean;
 
     @Column({
         type: DataType.INTEGER,
@@ -58,13 +59,14 @@ export class Room extends Model {
 
     @Column({
         type: DataType.INTEGER,
-        allowNull: false
+        allowNull: true,
+        defaultValue: 0
     })
     wereThere!: number;
 
     @Column({
         type: DataType.INTEGER,
-        allowNull: false
+        allowNull: false,
     })
     empty!: number;
 

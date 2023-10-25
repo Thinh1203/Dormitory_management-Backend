@@ -73,6 +73,12 @@ export class Student extends Model {
         type: DataType.STRING,
         allowNull: false
     })
+    major!: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false
+    })
     classs!: string;
 
     @Column({

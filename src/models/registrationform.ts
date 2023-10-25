@@ -4,7 +4,7 @@ import { Room } from "./room";
 import { SchoolYear } from "./schoolyear";
 
 @Table({
-    timestamps: false,
+    timestamps: true,
     tableName: "registrationforms"
 })
 
@@ -18,10 +18,10 @@ export class RegistrationForm extends Model {
     id!: number;
 
     @Column({
-        type: DataType.DATE,
+        type: DataType.INTEGER,
         allowNull: false
     })
-    registrationTime!: Date;
+    registrationTime!: number;
 
     @Column({
         type: DataType.BOOLEAN,
@@ -31,7 +31,7 @@ export class RegistrationForm extends Model {
 
     @Column({
         type: DataType.TEXT,
-        allowNull: false
+        allowNull: true
     })
     wish!: string;
 

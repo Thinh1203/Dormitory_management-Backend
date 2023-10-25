@@ -13,13 +13,15 @@ passport.use(
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     },
     (payload, done) => {
+     
+      
       const { user_id, role } = payload;
 
       if (!user_id || !role) {
         return done("token is not valid!");
       }
       if (role === "admin") return done(null, payload);
-      return done("you dont have permission to do this", false);
+      return done("you don't have permission to do this", false);
     }
   )
 );
@@ -31,29 +33,30 @@ passport.use(
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     },
     async (payload, done) => {
-      const { user_id, role, fullName } = payload;
+      // console.log(payload);
+      const { user_id, role, mssv } = payload;
       const userManagerRepo = db.getRepository(Manager);
       const userManager = await userManagerRepo.findOne({ where: { id: user_id } });
-
+      
       if (!userManager) {
         const userStudentRepo = db.getRepository(Student);
         const userStudent = await userStudentRepo.findOne({ where: { id: user_id } });
         
         if (
-          !user_id || !role || !userStudent || !fullName || userStudent.id != user_id
+          !user_id || !role || !userStudent 
         ) {
           return done("token is not valid!", false);
         }
-        return done(null, { user_id, fullName, role });
+        return done(null, { user_id, mssv, role });
       }
 
 
       if (
-        !user_id || !role || !userManager || !fullName || userManager.id != user_id
+        !user_id || !role || !userManager 
       ) {
         return done("token is not valid!", false);
       }
-      return done(null, { user_id, fullName, role });
+      return done(null, { user_id, mssv, role });
     }
   )
 );

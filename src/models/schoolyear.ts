@@ -27,12 +27,6 @@ export class SchoolYear extends Model {
     })
     semester!: string;
 
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: false
-    })
-    time!: number;
-
     @HasMany(() => RegistrationForm)
     registrationform!: RegistrationForm[]
 
