@@ -39,7 +39,7 @@ export const update = async (id: number, data: any) => {
     const check = await notificationRepository.findByPk(id);
     if (!check) return BadRequestError("Notification not found!")
     const result = await notificationRepository.update(data, { where: { id } })
-    return result ? success() : failed();
+    return (result[0] > 0) ? success() : failed();
 }
 
 

@@ -39,7 +39,7 @@ export const createNewStudent = async (req: Request, res: Response, next: NextFu
 export const getOneStudent = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const rs = await userServices.getOneStudent(Number(id));
-  return isError(rs) ? next(err(rs, res)) : res.json(rs);
+  return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 }
 
 export const getAllStudent = async (req: Request, res: Response, next: NextFunction) => {
@@ -48,16 +48,14 @@ export const getAllStudent = async (req: Request, res: Response, next: NextFunct
     page = 1,
     search
   } = req.query;
-  
-   
-    const rs = await userServices.getAllStudent(Number(limit), Number(page), search && String(search));
-    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+  const rs = await userServices.getAllStudent(Number(limit), Number(page), search && String(search));
+  return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 }
 
 export const updateStudentInformation = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const rs = await userServices.updateStudentInformation(Number(id), req.body);
-  return isError(rs) ? next(err(rs, res)) : res.json(rs);
+  return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 }
 
 export const updateAvatar = async (req: Request, res: Response, next: NextFunction) => {
@@ -67,5 +65,5 @@ export const updateAvatar = async (req: Request, res: Response, next: NextFuncti
   if (!avatar) return next(err(BadRequestError("Avatar is required!"), res));
   const { path } = avatar;
   const rs = await userServices.updateAvatar(Number(id), path.replace(`public\\`, ""));
-  return isError(rs) ? next(err(rs, res)) : res.json(rs);
+  return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 }

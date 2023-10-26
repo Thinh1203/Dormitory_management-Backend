@@ -4,11 +4,15 @@ import { BuildingRoutes } from "./building.route";
 import { SchoolYearRoutes } from "./schoolYear.route";
 import { RoomRoutes } from "./room.route";
 import { NotificationRoutes } from "./notification.route";
+import { DeviceRoutes } from "./device.route";
+import { RegistrationFormRoutes } from "./registrationform.route";
 export const Routes = [
     UserRoutes,
     AuthRoutes,
     BuildingRoutes,
     SchoolYearRoutes,
     RoomRoutes,
-    NotificationRoutes
+    NotificationRoutes,
+    DeviceRoutes,
+    RegistrationFormRoutes
 ]

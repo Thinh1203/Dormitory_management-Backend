@@ -24,10 +24,11 @@ export class RegistrationForm extends Model {
     registrationTime!: number;
 
     @Column({
-        type: DataType.BOOLEAN,
-        allowNull: false
+        type: DataType.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     })
-    registrationStatus!: boolean;
+    registrationStatus!: number;
 
     @Column({
         type: DataType.TEXT,

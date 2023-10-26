@@ -3,7 +3,7 @@ import { Student } from "./student";
 import { Room } from "./room";
 
 @Table({
-    timestamps: false,
+    timestamps: true,
     tableName: "roomstudents"
 })
 
@@ -24,15 +24,10 @@ export class RoomStudent extends Model {
 
     @Column({
         type: DataType.BOOLEAN,
-        allowNull: false
+        allowNull: false,
+        defaultValue: false
     })
     paymentStatus!: boolean;
-
-    @Column({
-        type: DataType.DATE,
-        allowNull: false
-    })
-    paymentTime!: Date;
 
     @ForeignKey(() => Student)
     @Column

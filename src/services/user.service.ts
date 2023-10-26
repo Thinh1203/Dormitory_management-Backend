@@ -131,8 +131,8 @@ export const createNewStudent = async ({ mssv, fullName, gender, password, email
     const mssvExists = await userStudentRepository.findOne({ where: { mssv } });
     if (mssvExists) return BadRequestError("User already exists!");
 
-    const emailExists = await userStudentRepository.findOne({ where: { email } });
-    if (emailExists) return BadRequestError("Email already exists!");
+    // const emailExists = await userStudentRepository.findOne({ where: { email } });
+    // if (emailExists) return BadRequestError("Email already exists!");
 
     const numberPhoneExists = await userStudentRepository.findOne({ where: { numberPhone } });
     if (numberPhoneExists) return BadRequestError("Number phone already exists!");
