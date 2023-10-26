@@ -38,10 +38,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
         search,
     } = req.query;
 
+
     if (!areaCode && !roomMale && !capacity && !empty && !kitchen) {
         const rs = await roomService.getAll(Number(limit), Number(page), null, search && String(search));
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
-    } else {
+    } else {  
         const rs = await roomService.getAll(
             Number(limit),
             Number(page),

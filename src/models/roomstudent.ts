@@ -36,4 +36,10 @@ export class RoomStudent extends Model {
     @ForeignKey(() => Room)
     @Column
     roomId!: number;
+
+    @BelongsTo(() => Student)
+    student!: Student;
+    
+    @BelongsTo(() => Room)
+    room!: Room;
 }

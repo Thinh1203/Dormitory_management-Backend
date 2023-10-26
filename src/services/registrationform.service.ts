@@ -48,7 +48,7 @@ export const getAll = async (limit: number, page: number, filter: number | null 
     } = {};
 
     if (Number(filter) > 0) {
-        whereConditions.wish = { [Op.ne]: null, [Op.ne]: '' };
+        whereConditions.registrationStatus = { [Op.eq]: filter };
     }
     const filteredWhereConditions: {
         [key: string]: any;
@@ -107,4 +107,9 @@ export const updateOne = async (id: number, registrationStatus: number) => {
     }
     const result = await registrationFormRepository.update({ registrationStatus }, { where: { id } });
     return result[0] > 0 ? success() : failed();
+}
+
+export const checkFormUser = async (user: any) => {
+    const result = await registrationFormRepository.findOne({where: {studentId: user.user_id}});
+   return result ? result : BadRequestError("Not found!");
 }

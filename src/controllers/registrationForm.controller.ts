@@ -7,7 +7,7 @@ export const addForm = async (req: Request, res: Response, next: NextFunction) =
     const { wish, roomId, schoolyearId, registrationTime } = req.body;
     const user = req.user;
 
-    if (wish.length > 0) {
+    if (wish && wish.length > 0) {
         const rs = await registrationFormService.addForm(Number(registrationTime), wish, user, Number(roomId), Number(schoolyearId));
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
     }
@@ -26,9 +26,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
     if (Number(filter) < 1) {
         const rs = await registrationFormService.getAll(Number(limit), Number(page), null);
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+    } else {
+        const rs = await registrationFormService.getAll(Number(limit), Number(page), Number(filter));
+        return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
     }
-    const rs = await registrationFormService.getAll(Number(limit), Number(page), Number(filter));
-    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+
 };
 
 export const deleteOne = async (req: Request, res: Response, next: NextFunction) => {
@@ -41,5 +43,13 @@ export const updateOne = async (req: Request, res: Response, next: NextFunction)
     const { id } = req.params;
     const { registrationStatus } = req.body;
     const rs = await registrationFormService.updateOne(Number(id), Number(registrationStatus));
+    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+};
+
+
+export const checkFormUser = async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+    
+    const rs = await registrationFormService.checkFormUser(user);
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };
