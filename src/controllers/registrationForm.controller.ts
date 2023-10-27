@@ -4,14 +4,14 @@ import { BadRequestError, isError } from "../utils/error";
 import err from "../middlewares/error";
 
 export const addForm = async (req: Request, res: Response, next: NextFunction) => {
-    const { wish, roomId, schoolyearId, registrationTime } = req.body;
+    const { wish, roomId, schoolYearId, registrationTime } = req.body;
     const user = req.user;
 
-    if (wish && wish.length > 0) {
-        const rs = await registrationFormService.addForm(Number(registrationTime), wish, user, Number(roomId), Number(schoolyearId));
+    if (wish !== undefined && wish.length > 0) {
+        const rs = await registrationFormService.addForm(Number(registrationTime), wish, user, Number(roomId), Number(schoolYearId));
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
     }
-    const rs = await registrationFormService.addForm(Number(registrationTime), null, user, Number(roomId), Number(schoolyearId));
+    const rs = await registrationFormService.addForm(Number(registrationTime), null, user, Number(roomId), Number(schoolYearId));
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };
 
@@ -49,7 +49,7 @@ export const updateOne = async (req: Request, res: Response, next: NextFunction)
 
 export const checkFormUser = async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
-    
+
     const rs = await registrationFormService.checkFormUser(user);
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };

@@ -7,6 +7,7 @@ import { Student } from "../models/student";
 import { Room } from "../models/room";
 import { SchoolYear } from "../models/schoolyear";
 import { RoomStudent } from "../models/roomstudent";
+import { Building } from "../models/building";
 
 const registrationFormRepository = db.getRepository(RegistrationForm);
 const studentRepository = db.getRepository(Student);
@@ -14,14 +15,14 @@ const roomRepository = db.getRepository(Room);
 const schoolYearRepository = db.getRepository(SchoolYear);
 const studentInRoomRepository = db.getRepository(RoomStudent);
 
-export const addForm = async (registrationTime: number, wish: string | null = null, student: any, roomId: number, schoolyearId: number) => {
-    if (!registrationTime || !roomId || !schoolyearId) return BadRequestError("Missing required parameters");
+export const addForm = async (registrationTime: number, wish: string | null = null, student: any, roomId: number, schoolYearId: number) => {
+    if (!registrationTime || !roomId || !schoolYearId) return BadRequestError("Missing required parameters");
     return await registrationFormRepository.create({
         registrationTime: registrationTime,
         wish: wish || null,
         studentId: student.user_id,
         roomId: roomId,
-        schoolyearId: schoolyearId,
+        schoolyearId: schoolYearId,
     });
 }
 
@@ -110,6 +111,22 @@ export const updateOne = async (id: number, registrationStatus: number) => {
 }
 
 export const checkFormUser = async (user: any) => {
-    const result = await registrationFormRepository.findOne({where: {studentId: user.user_id}});
-   return result ? result : BadRequestError("Not found!");
+    const result = await registrationFormRepository.findOne({
+        where: {studentId: user.user_id}});
+    if (!result) return BadRequestError("Not found!");
+    const room = await roomRepository.findOne({
+        where: {id: result.roomId}  
+        , 
+        include: {
+        model: Building,
+    }});
+    const schoolyear = await schoolYearRepository.findOne({
+        where: {id:result.schoolyearId}
+    })
+    return {
+        registrationForm: result,
+        room: room,
+        schoolYear: schoolyear 
+    };
+//    return result ? result : BadRequestError("Not found!");
 }

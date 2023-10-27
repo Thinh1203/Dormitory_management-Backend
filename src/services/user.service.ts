@@ -6,6 +6,7 @@ import { Account } from '../models/account';
 import { Student } from "../models/student";
 import { failed, success } from "../utils/response";
 import { Op } from "sequelize";
+const bcrypt = require('bcryptjs');
 
 interface UserManager {
     mscb: string;
@@ -131,6 +132,7 @@ export const createNewStudent = async ({ mssv, fullName, gender, password, email
     const mssvExists = await userStudentRepository.findOne({ where: { mssv } });
     if (mssvExists) return BadRequestError("User already exists!");
 
+
     // const emailExists = await userStudentRepository.findOne({ where: { email } });
     // if (emailExists) return BadRequestError("Email already exists!");
 
@@ -175,10 +177,15 @@ export const getOneStudent = async (id: number): Promise<ErrorInterface | Studen
     return findUser ? findUser : BadRequestError("User not found!");
 }
 
+export const getInformationStudent = async (user: any) => {
+    const findUser = await userStudentRepository.findOne({ where: { id: user.user_id } });
+    return findUser ? findUser : BadRequestError("User not found!");
+}
+
 export const getAllStudent = async (limit: number, page: number, search: string | undefined = undefined) => {
     const offset = ((page ? page : 1) - 1) * limit;
- 
-    
+
+
     const whereConditions: {
         [key: string]: any;
     } = {
@@ -195,7 +202,7 @@ export const getAllStudent = async (limit: number, page: number, search: string 
     const { count, rows } = await userStudentRepository.findAndCountAll(queryOptions);
     const last_page = Math.ceil(count / limit);
     const prev_page = page - 1 < 1 ? null : page - 1;
-    const next_page = page + 1 > last_page ? null : page +1;
+    const next_page = page + 1 > last_page ? null : page + 1;
     return count > 0 ? {
         current_page: page,
         prev_page,
@@ -221,5 +228,18 @@ export const updateAvatar = async (id: number, avatar: string) => {
     if (!student) return BadRequestError("User not found!");
 
     const result = await userStudentRepository.update({ avatar }, { where: { id: id } });
+    return (result[0] > 0) ? success() : failed();
+}
+
+export const updatePassword = async (user: any, oldPassword: string, newPassword: string) => {
+    const account = await accountRepository.findOne({ where: { userName: user.mssv } });
+    if (!account) return BadRequestError("User not found!");
+
+    if (!bcrypt.compareSync(oldPassword, account.password))
+        return BadRequestError("Password incorrect!");
+
+    const newPass = await bcrypt.hash(newPassword, 8);
+
+    const result = await accountRepository.update({ password: newPass }, { where: { id: account.id } });
     return (result[0] > 0) ? success() : failed();
 }

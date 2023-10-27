@@ -12,8 +12,9 @@ export const UserRoutes = (app: Express) => {
     router.get("/manager/getAll", [auth.verifyToken(), auth.require_admin()], user.getAllManager);
     router.put("/manager/update/:id", [auth.verifyToken(), auth.require_admin()], user.updateManagerInformation)
 
-    router.post("/student/add", [upload.single('avatar'), validation.validateImageExtension], user.createNewStudent);
+    router.post("/student/add", upload.single('avatar'), user.createNewStudent);
     router.get("/student/getOne/:id", auth.verifyToken(), user.getOneStudent);
+    router.get("/student/getInformation", auth.verifyToken(), user.getInformationStudent);
     router.get("/student/getAll", [auth.verifyToken(), auth.require_admin()], user.getAllStudent);
     router.patch("/student/update/:id", auth.verifyToken(), user.updateStudentInformation);
     router.patch("/student/update/avatar/:id", [upload.single('avatar'), validation.validateImageExtension], user.updateAvatar);
