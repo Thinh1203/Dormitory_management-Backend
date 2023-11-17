@@ -41,7 +41,7 @@ export class RegistrationForm extends Model {
         allowNull: false
     })
     studentId!: number;
-  
+
     @ForeignKey(() => Room)
     @Column({
         allowNull: false
@@ -53,4 +53,11 @@ export class RegistrationForm extends Model {
         allowNull: false
     })
     schoolyearId!: number;
+
+    
+    @BelongsTo(() => Student)
+    student!: Student;
+
+    @BelongsTo(() => Room)
+    room!: Room;
 }

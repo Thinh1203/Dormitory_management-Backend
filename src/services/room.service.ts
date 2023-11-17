@@ -51,6 +51,7 @@ export const updateRoom = async (id: number, data: any) => {
 
 export const deleteRoom = async (id: number) => {
     const checkRoom = await roomRepository.findByPk(id);
+    
     if (!checkRoom) return BadRequestError("Room not found!");
     const result = await roomRepository.destroy({ where: { id: id } });
     return (result) ? success() : failed();

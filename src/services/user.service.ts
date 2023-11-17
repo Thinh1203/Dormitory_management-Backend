@@ -6,6 +6,7 @@ import { Account } from '../models/account';
 import { Student } from "../models/student";
 import { failed, success } from "../utils/response";
 import { Op } from "sequelize";
+import { RegistrationForm } from "../models/registrationform";
 const bcrypt = require('bcryptjs');
 
 interface UserManager {
@@ -184,8 +185,6 @@ export const getInformationStudent = async (user: any) => {
 
 export const getAllStudent = async (limit: number, page: number, search: string | undefined = undefined) => {
     const offset = ((page ? page : 1) - 1) * limit;
-
-
     const whereConditions: {
         [key: string]: any;
     } = {
@@ -194,12 +193,18 @@ export const getAllStudent = async (limit: number, page: number, search: string 
             { fullName: { [Op.substring]: search } }
         ]
     };
+
+
     const queryOptions: any = {
         where: whereConditions,
         offset: offset,
         limit: limit,
+        include: {
+            model: RegistrationForm
+        }
     };
     const { count, rows } = await userStudentRepository.findAndCountAll(queryOptions);
+
     const last_page = Math.ceil(count / limit);
     const prev_page = page - 1 < 1 ? null : page - 1;
     const next_page = page + 1 > last_page ? null : page + 1;

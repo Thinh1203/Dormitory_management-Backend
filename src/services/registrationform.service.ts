@@ -62,11 +62,24 @@ export const getAll = async (limit: number, page: number, filter: number | null 
     }
     const queryOptions: any = {
         where: filteredWhereConditions,
+        attributes: {
+            exclude: ["roomId", "studentId", "schoolYearId"]
+        },
         offset: offset,
         limit: limit,
+        include: [
+            {
+                model: Room
+            },
+            {
+                model: Student,
+                attributes: ['id', 'avatar', 'fullName', 'gender', 'email', 'numberPhone'],
+            }
+        ]
     };
 
     const { count, rows } = await registrationFormRepository.findAndCountAll(queryOptions);
+
     const last_page = Math.ceil(count / limit);
     const prev_page = page - 1 < 1 ? null : page - 1;
     const next_page = page + 1 > last_page ? null : page + 1;
@@ -89,8 +102,8 @@ export const deleteOne = async (id: number) => {
 }
 
 export const updateOne = async (id: number, registrationStatus: number) => {
-   
-    
+
+
     const form = await registrationFormRepository.findByPk(id);
     if (!form) return BadRequestError("Form not found!");
     if (registrationStatus === 1) {
@@ -112,21 +125,23 @@ export const updateOne = async (id: number, registrationStatus: number) => {
 
 export const checkFormUser = async (user: any) => {
     const result = await registrationFormRepository.findOne({
-        where: {studentId: user.user_id}});
+        where: { studentId: user.user_id }
+    });
     if (!result) return BadRequestError("Not found!");
     const room = await roomRepository.findOne({
-        where: {id: result.roomId}  
-        , 
+        where: { id: result.roomId }
+        ,
         include: {
-        model: Building,
-    }});
+            model: Building,
+        }
+    });
     const schoolyear = await schoolYearRepository.findOne({
-        where: {id:result.schoolyearId}
+        where: { id: result.schoolyearId }
     })
     return {
         registrationForm: result,
         room: room,
-        schoolYear: schoolyear 
+        schoolYear: schoolyear
     };
-//    return result ? result : BadRequestError("Not found!");
+    //    return result ? result : BadRequestError("Not found!");
 }

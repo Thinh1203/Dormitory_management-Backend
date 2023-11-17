@@ -6,11 +6,11 @@ import * as auth from "../middlewares/auth";
 export const RoomRoutes = (app: Express) => {
     const router = express.Router();
 
-    router.post("/add", auth.verifyToken(), room.addRoom);
+    router.post("/add", [auth.verifyToken(), auth.require_admin()], room.addRoom);
     router.get("/getAll", auth.verifyToken(), room.getAll);
-    router.get("/getOne/:id", room.getOne);
-    router.patch("/update/:id", room.updateRoom);
-    router.delete("/delete/:id", room.deleteRoom);
+    router.get("/getOne/:id", auth.verifyToken(), room.getOne);
+    router.patch("/update/:id", [auth.verifyToken(), auth.require_admin()], room.updateRoom);
+    router.delete("/delete/:id", [auth.verifyToken(), auth.require_admin()], room.deleteRoom);
 
 
     app.use("/api/room", router);

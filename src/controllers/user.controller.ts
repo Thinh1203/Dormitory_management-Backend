@@ -55,7 +55,7 @@ export const getAllStudent = async (req: Request, res: Response, next: NextFunct
   const {
     limit = 10,
     page = 1,
-    search
+    search 
   } = req.query;
   const rs = await userServices.getAllStudent(Number(limit), Number(page), search && String(search));
   return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);

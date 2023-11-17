@@ -16,7 +16,7 @@ export const updateRoom = async (req: Request, res: Response, next: NextFunction
 };
 
 export const deleteRoom = async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
+    const { id } = req.params; 
     const rs = await roomService.deleteRoom(Number(id));
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };

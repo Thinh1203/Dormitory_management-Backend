@@ -15,3 +15,10 @@ export const checkRoom = async (req: Request, res: Response, next: NextFunction)
     const rs = await roomStudentService.checkRoom(user);
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };
+
+export const updateOne = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { paymentStatus } = req.body;
+    const rs = await roomStudentService.updateOne(Number(id), paymentStatus);
+    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+};
