@@ -28,7 +28,6 @@ export const updateManagerInformation = async (req: Request, res: Response, next
 }
 
 export const createNewStudent = async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body);
   
   const { mssv, fullName, gender, password, email, numberPhone, address, identificationNumber, classs, course, relativeName, relativeNumberPhone, birthday, relationship, major } = req.body;
   const avatar = req.file;
@@ -43,6 +42,13 @@ export const getOneStudent = async (req: Request, res: Response, next: NextFunct
   const rs = await userServices.getOneStudent(Number(id));
   return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 }
+
+export const deleteOneStudent = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  const rs = await userServices.deleteOneStudent(Number(id));
+  return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+}
+
 
 export const getInformationStudent = async (req: Request, res: Response, next: NextFunction) => {
   const user = req.user;

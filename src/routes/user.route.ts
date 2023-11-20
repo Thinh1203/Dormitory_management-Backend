@@ -14,6 +14,7 @@ export const UserRoutes = (app: Express) => {
 
     router.post("/student/add", upload.single('avatar'), user.createNewStudent);
     router.get("/student/getOne/:id", auth.verifyToken(), user.getOneStudent);
+    router.delete("/student/deleteOne/:id", [auth.verifyToken(), auth.require_admin()], user.deleteOneStudent);
     router.get("/student/getInformation", auth.verifyToken(), user.getInformationStudent);
     router.get("/student/getAll", [auth.verifyToken(), auth.require_admin()], user.getAllStudent);
     router.patch("/student/update/:id", auth.verifyToken(), user.updateStudentInformation);

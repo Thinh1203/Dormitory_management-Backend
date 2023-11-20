@@ -178,6 +178,15 @@ export const getOneStudent = async (id: number): Promise<ErrorInterface | Studen
     return findUser ? findUser : BadRequestError("User not found!");
 }
 
+export const deleteOneStudent = async (id: number) => {
+    const findUser = await userStudentRepository.findByPk(id);
+    if (!findUser) return BadRequestError("User not found!");
+    const account_id = findUser?.accountId;
+    const result = await userStudentRepository.destroy({ where: { id: id } });
+    const account = await accountRepository.destroy({ where: { id: account_id } });
+    return (account) ? success() : failed();
+}
+
 export const getInformationStudent = async (user: any) => {
     const findUser = await userStudentRepository.findOne({ where: { id: user.user_id } });
     return findUser ? findUser : BadRequestError("User not found!");
