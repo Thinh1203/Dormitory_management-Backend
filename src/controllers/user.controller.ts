@@ -5,6 +5,7 @@ import err from "../middlewares/error";
 
 export const createNewManager = async (req: Request, res: Response, next: NextFunction) => {
   const { mscb, fullName, gender, password, email, birthday, numberPhone, address } = req.body;
+
   const rs = await userServices.createNewManager({ mscb, fullName, gender, email, password, birthday, numberPhone, address });
   return isError(rs) ? next(err(rs, res)) : res.json(rs);
 };
@@ -16,9 +17,16 @@ export const getOneManager = async (req: Request, res: Response, next: NextFunct
 };
 
 export const getAllManager = async (req: Request, res: Response, next: NextFunction) => {
-  const rs = await userServices.getAllManager();
+  const user = req.user;
+  const rs = await userServices.getAllManager(user);
   return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };
+
+export const deleteOneManager = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  const rs = await userServices.deleteOneManager(Number(id));
+  return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+}
 
 export const updateManagerInformation = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
@@ -28,7 +36,7 @@ export const updateManagerInformation = async (req: Request, res: Response, next
 }
 
 export const createNewStudent = async (req: Request, res: Response, next: NextFunction) => {
-  
+
   const { mssv, fullName, gender, password, email, numberPhone, address, identificationNumber, classs, course, relativeName, relativeNumberPhone, birthday, relationship, major } = req.body;
   const avatar = req.file;
   if (!avatar) return next(err(BadRequestError("Avatar is required!"), res));
@@ -61,7 +69,7 @@ export const getAllStudent = async (req: Request, res: Response, next: NextFunct
   const {
     limit = 10,
     page = 1,
-    search 
+    search
   } = req.query;
   const rs = await userServices.getAllStudent(Number(limit), Number(page), search && String(search));
   return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);

@@ -89,14 +89,30 @@ export const getOneManager = async (id: number): Promise<ErrorInterface | Manage
     return findUser ? findUser : BadRequestError("User not found!");
 };
 
-export const getAllManager = async () => {
-    const findAll = await userManagerRepository.findAll();
+export const getAllManager = async (user: any) => {
+    const findAll = await userManagerRepository.findAll({
+        where: {
+            id: {
+                [Op.ne]: user.user_id,
+            },
+        }
+    });
+
     return findAll ? findAll : BadRequestError("User not found!");
 };
 
 export const findOneByAccount = async (userName: string): Promise<ErrorInterface | Account> => {
     const result = await accountRepository.findOne({ where: { userName } });
     return result ? result : BadRequestError("User not found!");
+}
+
+export const deleteOneManager = async (id: number) => {
+    const findUser = await userManagerRepository.findByPk(id);
+    if (!findUser) return BadRequestError("User not found!");
+    const account_id = findUser?.accountId;
+    const result = await userManagerRepository.destroy({ where: { id: id } });
+    const account = await accountRepository.destroy({ where: { id: account_id } });
+    return (account) ? success() : failed();
 }
 
 export const findOneByUser = async (id: number) => {

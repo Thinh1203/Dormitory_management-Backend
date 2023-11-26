@@ -22,12 +22,12 @@ export const getOne = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
-    const { limit = 10, page = 1, filter } = req.query;
-    if (Number(filter) < 1) {
-        const rs = await registrationFormService.getAll(Number(limit), Number(page), null);
+    const { limit = 10, page = 1, filter, search } = req.query;
+    if (Number(filter) > 3) {
+        const rs = await registrationFormService.getAll(Number(limit), Number(page), null, search && String(search));
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
     } else {
-        const rs = await registrationFormService.getAll(Number(limit), Number(page), Number(filter));
+        const rs = await registrationFormService.getAll(Number(limit), Number(page), Number(filter), search && String(search));
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
     }
 

@@ -7,6 +7,7 @@ import { NotificationRoutes } from "./notification.route";
 import { DeviceRoutes } from "./device.route";
 import { RegistrationFormRoutes } from "./registrationform.route";
 import { RoomStudentRoutes } from "./roomStudent.route";
+import { PaymentRoute } from "./payment.route";
 export const Routes = [
     UserRoutes,
     AuthRoutes,
@@ -16,5 +17,6 @@ export const Routes = [
     NotificationRoutes,
     DeviceRoutes,
     RegistrationFormRoutes,
-    RoomStudentRoutes
+    RoomStudentRoutes,
+    PaymentRoute
 ]

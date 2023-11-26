@@ -69,6 +69,7 @@ export const getOne = async (id: number): Promise<ErrorInterface | Room> => {
 export const getAll = async (limit: number, page: number, filter: FilterRoom | null = null, search: string | undefined = undefined) => {
     const offset = ((page ? page : 1) - 1) * limit;
    
+  
     
     const whereConditions: {
         [key: string]: any;

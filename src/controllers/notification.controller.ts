@@ -19,7 +19,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction) =>
 
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
-    const { limit = 8, page = 1 } = req.query;
+    const { limit = 4, page = 1 } = req.query;
     const rs = await notificationService.getAll(Number(limit), Number(page));
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };

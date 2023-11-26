@@ -9,8 +9,8 @@ export const NotificationRoutes = (app: Express) => {
     router.post("/add", [auth.verifyToken(), auth.require_admin()], notification.createNotification);
     router.get("/getOne/:id", notification.getOne);
     router.get("/getAll", auth.verifyToken(), notification.getAll);
-    router.patch("/update/:id", notification.update)
-    router.delete("delete/:id", notification.deleteOne);
+    router.patch("/update/:id", [auth.verifyToken(), auth.require_admin()], notification.update)
+    router.delete("/delete/:id", [auth.verifyToken(), auth.require_admin()], notification.deleteOne);
 
     app.use("/api/notification", router);
 }

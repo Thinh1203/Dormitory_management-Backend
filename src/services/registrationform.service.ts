@@ -41,58 +41,143 @@ export const getOne = async (id: number) => {
     }
 }
 
-export const getAll = async (limit: number, page: number, filter: number | null = null) => {
-    const offset = ((page ? page : 1) - 1) * limit;
+// export const getAll = async (limit: number, page: number, filter: number | null = null, search: string | undefined = undefined) => {
+//     const offset = ((page ? page : 1) - 1) * limit;
 
-    const whereConditions: {
-        [key: string]: any;
-    } = {};
+//     const whereConditions: {
+//         [key: string]: any;
+//     } = {};
 
-    if (Number(filter) > 0) {
+//     if (Number(filter) > 0) {
+//         whereConditions.registrationStatus = { [Op.eq]: filter };
+//     }
+//     const filteredWhereConditions: {
+//         [key: string]: any;
+//     } = {};
+
+//     for (const key in whereConditions) {
+//         if (whereConditions[key] !== undefined) {
+//             filteredWhereConditions[key] = whereConditions[key];
+//         }
+//     }
+//     const queryOptions: any = {
+//         where: filteredWhereConditions,
+//         attributes: {
+//             exclude: ["roomId", "studentId", "schoolYearId"]
+//         },
+//         offset: offset,
+//         limit: limit,
+//         include: [
+//             {
+//                 model: Room
+//             },
+//             {
+//                 model: Student,
+//                 attributes: ['id','mssv', 'avatar', 'fullName', 'gender', 'email', 'numberPhone'],
+//                 where: {
+//                     [Op.or]: {
+//                         fullName: search !== undefined && search !== "" && search !== null ? { [Op.substring]: search } : undefined,
+//                         mssv: search !== undefined && search !== "" && search !== null ? { [Op.substring]: search } : undefined,
+//                     }
+//                 }
+//             }
+//         ]
+//     };
+
+//     const { count, rows } = await registrationFormRepository.findAndCountAll(queryOptions);
+
+//     const last_page = Math.ceil(count / limit);
+//     const prev_page = page - 1 < 1 ? null : page - 1;
+//     const next_page = page + 1 > last_page ? null : page + 1;
+//     return (count > 0) ? {
+//         current_page: page,
+//         prev_page,
+//         next_page,
+//         last_page,
+//         data_per_page: limit,
+//         total: count,
+//         data: rows
+//     } : BadRequestError("Form not found!");
+// }
+
+export const getAll = async (
+    limit: number,
+    page: number,
+    filter: number | null = null,
+    search: string | undefined = undefined
+) => {
+    const offset = (page - 1) * limit;
+
+
+    const whereConditions: { [key: string]: any } = {};
+    if (Number(filter) === 0 || Number(filter) === 1 || Number(filter) === 2) {
         whereConditions.registrationStatus = { [Op.eq]: filter };
     }
-    const filteredWhereConditions: {
-        [key: string]: any;
-    } = {};
 
+    const filteredWhereConditions: { [key: string]: any } = {};
     for (const key in whereConditions) {
         if (whereConditions[key] !== undefined) {
             filteredWhereConditions[key] = whereConditions[key];
         }
-    }
+    };
+
     const queryOptions: any = {
         where: filteredWhereConditions,
-        attributes: {
-            exclude: ["roomId", "studentId", "schoolYearId"]
-        },
-        offset: offset,
-        limit: limit,
-        include: [
+        offset,
+        limit,
+    };
+
+    if (search !== '') {
+        queryOptions.include = [
             {
-                model: Room
+                model: Room,
+                include: {
+                    model: Building
+                }
             },
             {
                 model: Student,
-                attributes: ['id', 'avatar', 'fullName', 'gender', 'email', 'numberPhone'],
+                where: {
+                    [Op.or]: {
+                        fullName: search !== ''  && search !== null ? { [Op.substring]: search } : undefined,
+                        mssv: search !== ''  && search !== null ? { [Op.substring]: search } : undefined,
+                    },
+                },
+            },
+        ]
+    } else {
+        queryOptions.include = [
+            {
+                model: Room,
+                include: {
+                    model: Building
+                }
+            },
+            {
+                model: Student,
+                // attributes: ['id', 'mssv', 'avatar', 'fullName', 'gender', 'email', 'numberPhone'],
             }
         ]
-    };
+    }
 
     const { count, rows } = await registrationFormRepository.findAndCountAll(queryOptions);
 
     const last_page = Math.ceil(count / limit);
     const prev_page = page - 1 < 1 ? null : page - 1;
     const next_page = page + 1 > last_page ? null : page + 1;
-    return (count > 0) ? {
-        current_page: page,
-        prev_page,
-        next_page,
-        last_page,
-        data_per_page: limit,
-        total: count,
-        data: rows
-    } : BadRequestError("Form not found!");
-}
+
+    return count > 0
+        ? {
+            current_page: page,
+            prev_page,
+            next_page,
+            last_page,
+            data_per_page: limit,
+            total: count,
+            data: rows,
+        }
+        : BadRequestError('Form not found!');
+};
 
 export const deleteOne = async (id: number) => {
     const check = await registrationFormRepository.findByPk(id);

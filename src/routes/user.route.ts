@@ -10,7 +10,8 @@ export const UserRoutes = (app: Express) => {
     router.post("/manager/add", [auth.verifyToken(), auth.require_admin()], user.createNewManager);
     router.get("/manager/getOne/:id", [auth.verifyToken(), auth.require_admin()], user.getOneManager);
     router.get("/manager/getAll", [auth.verifyToken(), auth.require_admin()], user.getAllManager);
-    router.put("/manager/update/:id", [auth.verifyToken(), auth.require_admin()], user.updateManagerInformation)
+    router.patch("/manager/update/:id", [auth.verifyToken(), auth.require_admin()], user.updateManagerInformation);
+    router.delete("/manager/deleteOne/:id", [auth.verifyToken(), auth.require_admin()], user.deleteOneManager);
 
     router.post("/student/add", upload.single('avatar'), user.createNewStudent);
     router.get("/student/getOne/:id", auth.verifyToken(), user.getOneStudent);
