@@ -65,6 +65,11 @@ export const getInformationStudent = async (req: Request, res: Response, next: N
 }
 
 
+export const getList = async (req: Request, res: Response, next: NextFunction) => {
+  const rs = await userServices.getList();
+  return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+}
+
 export const getAllStudent = async (req: Request, res: Response, next: NextFunction) => {
   const {
     limit = 10,

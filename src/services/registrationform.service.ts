@@ -8,6 +8,7 @@ import { Room } from "../models/room";
 import { SchoolYear } from "../models/schoolyear";
 import { RoomStudent } from "../models/roomstudent";
 import { Building } from "../models/building";
+import { sendMail } from "../middlewares/sendmail";
 
 const registrationFormRepository = db.getRepository(RegistrationForm);
 const studentRepository = db.getRepository(Student);
@@ -29,8 +30,19 @@ export const addForm = async (registrationTime: number, wish: string | null = nu
 export const getOne = async (id: number) => {
     const registerForm = await registrationFormRepository.findByPk(id);
     if (!registerForm) return BadRequestError("Form not found!");
-    const student = await studentRepository.findOne({ where: { id: registerForm.studentId } });
-    const room = await roomRepository.findOne({ where: { id: registerForm.roomId } });
+    const student = await studentRepository.findOne(
+        {
+            where: { id: registerForm.studentId },
+        }
+    );
+    const room = await roomRepository.findOne(
+        {
+            where: { id: registerForm.roomId },
+            include: {
+                model: Building
+            }
+        }
+    );
     const schoolyear = await schoolYearRepository.findOne({ where: { id: registerForm.schoolyearId } });
 
     return {
@@ -139,8 +151,8 @@ export const getAll = async (
                 model: Student,
                 where: {
                     [Op.or]: {
-                        fullName: search !== ''  && search !== null ? { [Op.substring]: search } : undefined,
-                        mssv: search !== ''  && search !== null ? { [Op.substring]: search } : undefined,
+                        fullName: search !== '' && search !== null ? { [Op.substring]: search } : undefined,
+                        mssv: search !== '' && search !== null ? { [Op.substring]: search } : undefined,
                     },
                 },
             },
@@ -188,20 +200,40 @@ export const deleteOne = async (id: number) => {
 
 export const updateOne = async (id: number, registrationStatus: number) => {
 
-
     const form = await registrationFormRepository.findByPk(id);
+
     if (!form) return BadRequestError("Form not found!");
     if (registrationStatus === 1) {
+
         const room = await roomRepository.findOne({ where: { id: form.roomId } });
         const wereThereIncrement = Number(room?.wereThere) + 1;
         const emptyWereThere = Number(room?.actualCapacity) - wereThereIncrement;
         const updateRoom = await roomRepository.update({ wereThere: wereThereIncrement, empty: emptyWereThere }, { where: { id: room?.id } });
 
-        const student = await studentRepository.findOne({ where: { id: form.studentId } })
+        const student = await studentRepository.findOne({ where: { id: form.studentId } });
         const roomFee = Number(form?.registrationTime) * Number(room?.price);
 
         const addStudentInRoom = await studentInRoomRepository.create({ roomFee, studentId: student?.id, roomId: room?.id });
+
         const result = await registrationFormRepository.update({ registrationStatus }, { where: { id } });
+        const subject = `Đơn đăng ký phòng ${room?.roomCode}`;
+        let html = `
+        <p>Đơn đăng ký phòng: <b>${room?.roomCode}</b> của bạn đã được duyệt.</p>
+        <p>Thời gian đăng ký ở của bạn là: <b>${form?.registrationTime} tháng</b></p>
+        <p>Tổng phí phòng: <b>${roomFee}đồng</b></p>
+        <h3>Vui lòng thanh toán trong thời gian thông báo trên hệ thống.</h3>`;
+        sendMail(student?.email, subject, html);
+        return result[0] > 0 ? success() : failed();
+    }
+    if (registrationStatus === 2) {
+        const room = await roomRepository.findOne({ where: { id: form.roomId } });
+        const student = await studentRepository.findOne({ where: { id: form.studentId } })
+        const result = await registrationFormRepository.update({ registrationStatus }, { where: { id } });
+        const subject = `Đơn đăng ký phòng ${room?.roomCode}`;
+        let html = `
+        <p>Đơn đăng ký phòng: <b>${room?.roomCode}</b> của bạn đã bị từ chối.</p>
+        <h3> Phòng đã đầy hoặc thông tin đăng ký không phù hợp, vui lòng kiểm tra lại.</h3>`;
+        sendMail(student?.email, subject, html);
         return result[0] > 0 ? success() : failed();
     }
     const result = await registrationFormRepository.update({ registrationStatus }, { where: { id } });

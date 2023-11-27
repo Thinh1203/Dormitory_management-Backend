@@ -6,7 +6,7 @@ import err from "../middlewares/error";
 export const addBuilding = async (req: Request, res: Response, next: NextFunction) => {
     const { area, areaCode } = req.body;
     const rs = await buildingService.addBuilding({ area, areaCode });
-    console.log(rs);
+ 
     
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };

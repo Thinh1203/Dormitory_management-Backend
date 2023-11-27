@@ -8,7 +8,7 @@ export const RegistrationFormRoutes = (app: Express) => {
     router.post("/add", auth.verifyToken(), registrationForm.addForm);
     router.get("/getAll", [auth.verifyToken(), auth.require_admin()], registrationForm.getAll);
     router.get("/getOne/:id", auth.verifyToken(), registrationForm.getOne);
-    router.patch("/update/:id", registrationForm.updateOne);
+    router.patch("/update/:id", [auth.verifyToken(), auth.require_admin()], registrationForm.updateOne);
     router.delete("/delete/:id", registrationForm.deleteOne);
     router.get("/checkForm", auth.verifyToken(), registrationForm.checkFormUser);
 

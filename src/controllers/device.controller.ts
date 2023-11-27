@@ -10,7 +10,8 @@ export const addDevice = async (req: Request, res: Response, next: NextFunction)
 };
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
-    const rs = await deviceService.getAll();
+    const { limit = 6, page = 1 } = req.query;
+    const rs = await deviceService.getAll(Number(limit), Number(page));
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };
 

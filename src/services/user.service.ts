@@ -194,6 +194,11 @@ export const getOneStudent = async (id: number): Promise<ErrorInterface | Studen
     return findUser ? findUser : BadRequestError("User not found!");
 }
 
+export const getList = async (): Promise<ErrorInterface | Student[]> => {
+    const findUser = await userStudentRepository.findAll();
+    return findUser ? findUser : BadRequestError("User not found!");
+}
+
 export const deleteOneStudent = async (id: number) => {
     const findUser = await userStudentRepository.findByPk(id);
     if (!findUser) return BadRequestError("User not found!");

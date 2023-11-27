@@ -22,7 +22,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
-    const { limit = 10, page = 1, filter, search } = req.query;
+    const { limit = 6, page = 1, filter, search } = req.query;
     if (Number(filter) > 3) {
         const rs = await registrationFormService.getAll(Number(limit), Number(page), null, search && String(search));
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
