@@ -94,10 +94,22 @@ export const addNewReceipt = async (
     return BadRequestError("error");
 }
 
-// export const getAllList = async () => {
-//     const result = await deviceRepository.findAll();
-//     return result ? result : BadRequestError("Device not found!");
-// };
+export const statistical = async (schoolyearId: number) => {
+    const result = await electricityAndWaterRepository.findAll({
+        where: {
+            schoolyearId: { [Op.eq]: schoolyearId }
+        },
+        include: [
+            {
+                model: Receipt
+            },
+            {
+                model: SchoolYear
+            }
+        ]
+    });
+    return result ? result : BadRequestError("Device not found!");
+};
 
 export const getAll = async (
     limit: number,
@@ -124,6 +136,7 @@ export const getAll = async (
         where: filteredWhereConditions,
         offset: offset,
         limit: limit,
+        order: [['id', 'DESC']]
     };
 
     if ((filter?.paymentStatus === 'true' || filter?.paymentStatus === 'false') && search === undefined) {
@@ -138,6 +151,9 @@ export const getAll = async (
                 include: {
                     model: Building
                 }
+            },
+            {
+                model: SchoolYear
             }
         ]
     } else if (
@@ -157,10 +173,13 @@ export const getAll = async (
                 include: {
                     model: Building
                 }
+            },
+            {
+                model: SchoolYear
             }
         ]
     } else if (
-        !filter?.paymentStatus  && search !== undefined
+        !filter?.paymentStatus && search !== undefined
     ) {
         queryOptions.include = [
             {
@@ -173,6 +192,9 @@ export const getAll = async (
                 include: {
                     model: Building
                 }
+            },
+            {
+                model: SchoolYear
             }
         ]
     } else {
@@ -184,11 +206,25 @@ export const getAll = async (
                 include: {
                     model: Building
                 }
+            },
+            {
+                model: SchoolYear
             }
         ]
     }
 
+    const totalReceiptFee = await electricityAndWaterRepository.findAll({
+        include: [
+            {
+                model: Receipt
+            }, {
+                model: SchoolYear
+            }
+        ]
+    });
+
     const { count, rows } = await electricityAndWaterRepository.findAndCountAll(queryOptions);
+
 
     const last_page = Math.ceil(count / limit);
     const prev_page = page - 1 < 1 ? null : page - 1;
@@ -203,22 +239,28 @@ export const getAll = async (
             data_per_page: limit,
             total: count,
             data: rows,
+
         }
         : BadRequestError('Devices not found!');
 };
 
 
-// export const getOne = async (id: number): Promise<ErrorInterface | ListOfDevice> => {
-//     const result = await deviceRepository.findByPk(id);
-//     return result ? result : BadRequestError("Device not found!");
-// }
+export const getOne = async (id: number) => {
+    const result = await electricityAndWaterRepository.findOne({
+        where: { id: id },
+        include: {
+            model: Receipt
+        }
+    });
+    return result ? result : BadRequestError("Device not found!");
+}
 
-// export const updateOne = async (id: number, data: any) => {
-//     const check = await deviceRepository.findByPk(id);
-//     if (!check) return BadRequestError("Device not found!");
-//     const result = await deviceRepository.update(data, { where: { id } })
-//     return (result[0] > 0) ? success() : failed();
-// }
+export const updateOne = async (id: number, data: any) => {
+    const check = await receiptRepository.findByPk(id);
+    if (!check) return BadRequestError("Device not found!");
+    const result = await receiptRepository.update(data, { where: { id } })
+    return (result[0] > 0) ? success() : failed();
+}
 
 // export const deleteOne = async (id: number) => {
 //     const check = await deviceRepository.findByPk(id);

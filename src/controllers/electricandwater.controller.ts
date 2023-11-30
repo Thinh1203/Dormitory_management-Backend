@@ -24,7 +24,7 @@ export const addNewReceipt = async (req: Request, res: Response, next: NextFunct
 
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
-    const { limit = 10,
+    const { limit = 8,
         page = 1,
         month,
         schoolyearId,
@@ -33,21 +33,44 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
     } = req.query;
 
 
+
     if (!month && !schoolyearId && !paymentStatus) {
         const rs = await receiptService.getAll(Number(limit), Number(page), null, search && String(search));
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
-    } else {  
+    } else {
         const rs = await receiptService.getAll(
             Number(limit),
             Number(page),
             {
                 schoolyearId: schoolyearId ? Number(schoolyearId) : undefined,
                 month: month ? Number(month) : undefined,
-                paymentStatus: paymentStatus ? Boolean(paymentStatus) : undefined,
+                paymentStatus: paymentStatus ? paymentStatus : undefined,
             },
             search && String(search)
         );
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
     }
+
+};
+
+export const updateOne = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const rs = await receiptService.updateOne(Number(id), req.body);
+    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+};
+
+export const getOne = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const rs = await receiptService.getOne(Number(id));
+    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+};
+
+export const statistical = async (req: Request, res: Response, next: NextFunction) => {
+    const {
+        schoolyearId = 1,
+    } = req.query;
+
+    const rs = await receiptService.statistical(Number(schoolyearId));
+    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 
 };
