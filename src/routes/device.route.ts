@@ -8,6 +8,7 @@ export const DeviceRoutes = (app: Express) => {
 
     router.post("/add", [auth.verifyToken(), auth.require_admin()], device.addDevice);
     router.get("/getAll", auth.verifyToken(), device.getAll);
+    router.get("/getAllList", auth.verifyToken(), device.getAllList);
     router.get("/getOne/:id", auth.verifyToken(), device.getOne);
     router.patch("/update/:id", [auth.verifyToken(), auth.require_admin()], device.updateOne);
     router.delete("/delete/:id", [auth.verifyToken(), auth.require_admin()], device.deleteOne);

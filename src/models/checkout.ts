@@ -2,7 +2,7 @@ import { Model, DataType, Table, Column, BelongsTo, ForeignKey } from "sequelize
 import { Student } from "./student";
 
 @Table({
-    timestamps: false,
+    timestamps: true,
     tableName: "checkouts"
 })
 
@@ -20,18 +20,6 @@ export class CheckOut extends Model {
         allowNull: false
     })
     status!: boolean;
-
-    @Column({
-        type: DataType.DATE,
-        allowNull: false
-    })
-    registrationTime!: Date;
-
-    @Column({
-        type: DataType.DATE,
-        allowNull: false
-    })
-    approvedTime!: Date;
 
     @ForeignKey(() => Student)
     @Column({

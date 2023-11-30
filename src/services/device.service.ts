@@ -15,6 +15,11 @@ export const addDevice = async ({ repairCode, repairDetail }: DeviceDataType): P
     return await deviceRepository.create({ repairCode, repairDetail });
 }
 
+export const getAllList = async () => {
+    const result = await deviceRepository.findAll();
+    return result ? result : BadRequestError("Device not found!");
+};
+
 export const getAll = async (limit: number, page: number) => {
     const offset = ((page ? page : 1) - 1) * limit;
     const { count, rows } = await deviceRepository.findAndCountAll({

@@ -8,6 +8,9 @@ import { DeviceRoutes } from "./device.route";
 import { RegistrationFormRoutes } from "./registrationform.route";
 import { RoomStudentRoutes } from "./roomStudent.route";
 import { PaymentRoute } from "./payment.route";
+import { RepairRequestFormRoutes } from "./repairrequestform.route";
+import { RuleRoutes } from "./rule.route";
+import { ReceiptRoutes } from "./electricandwater.route";
 export const Routes = [
     UserRoutes,
     AuthRoutes,
@@ -18,5 +21,8 @@ export const Routes = [
     DeviceRoutes,
     RegistrationFormRoutes,
     RoomStudentRoutes,
-    PaymentRoute
+    PaymentRoute,
+    RepairRequestFormRoutes,
+    RuleRoutes,
+    ReceiptRoutes
 ]

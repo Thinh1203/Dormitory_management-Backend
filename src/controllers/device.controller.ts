@@ -15,6 +15,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };
 
+export const getAllList = async (req: Request, res: Response, next: NextFunction) => {
+    const rs = await deviceService.getAllList();
+    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+};
+
 export const getOne = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const rs = await deviceService.getOne(Number(id));

@@ -2,7 +2,7 @@ import { Model, DataType, Table, Column, BelongsTo, ForeignKey } from "sequelize
 import { Student } from "./student";
 
 @Table({
-    timestamps: false,
+    timestamps: true,
     tableName: "rules"
 })
 

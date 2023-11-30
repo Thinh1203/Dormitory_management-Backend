@@ -131,3 +131,4 @@ dist
 
 yarn.lock
 public/
+exported_data.xlsx

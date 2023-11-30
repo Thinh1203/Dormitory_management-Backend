@@ -16,11 +16,7 @@ export class RequestList extends Model {
     })
     id!: number;
 
-    @Column({
-        type: DataType.BOOLEAN,
-        allowNull: false
-    })
-    status!: boolean;
+
 
     @ForeignKey(() => RepairRequestForm)
     @Column
@@ -29,4 +25,10 @@ export class RequestList extends Model {
     @ForeignKey(() => ListOfDevice)
     @Column
     listofdeviceId!: number;
+
+    @BelongsTo(() => RepairRequestForm)
+    repairrequestform!: RepairRequestForm;
+
+    @BelongsTo(() => ListOfDevice)
+    listofdevice!: ListOfDevice;
 }

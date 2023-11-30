@@ -1,70 +1,87 @@
 import express, { Express, Request, Response } from "express";
-import dotenv from "dotenv";
-dotenv.config();
-const router = express.Router();
-import { format } from 'date-fns';
-
+// import * as validation from "../middlewares/validation";
+import * as auth from "../middlewares/auth";
+var paypal = require('paypal-rest-sdk');
 
 export const PaymentRoute = (app: Express) => {
-    router.post('/create', (req: Request, res: Response) => {
+    const router = express.Router();
 
-        var ipAddr = '127.0.0.1';
+    paypal.configure({
+        'mode': 'sandbox', //sandbox or live
+        'client_id': 'ASCXkNrghSUKpICkgEvv7OaWl3kvRCxyAxocz9xpqE0BrIu6VEnxlOOnUPpfb0EfVl02QiwSRleqQjqE',
+        'client_secret': 'EP9BZaNA8od3oFyJyqJiZR9Ts9crKlSCJlHVbgiLaNUsFC49iO9vOc71xNAFT9hXydzKzHfKve5hIGtj'
+    });
+    router.post('/pay', (req: Request, res: Response) => {
 
-        var tmnCode = 'IO86OCS5';
-        var secretKey = 'WJSSQXFLERREAZFLTVHQRVISNPRQTPZJ';
-        var vnpUrl = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
-        var returnUrl = 'http://localhost:3000/thongtinphong';
+        var create_payment_json = {
+            "intent": "sale",
+            "payer": {
+                "payment_method": "paypal"
+            },
+            "redirect_urls": {
+                "return_url": "http://localhost:3000/success",
+                "cancel_url": "http://localhost:3000/thongtinphong"
+            },
+            "transactions": [{
+                "item_list": {
+                    "items": [{
+                        "name": 'thanh toan',
+                        "sku": '1',
+                        "price": '10.00',
+                        "currency": 'USD',
+                        quantity: 1,
+                    }]
+                },
+                "amount": {
+                    "currency": "USD",
+                    "total": '10.00'
+                },
+                "description": "Thanh toán phí tiền phòng."
+            }]
+        };
 
-        var date = new Date();
+        paypal.payment.create(create_payment_json, function (error: any, payment: any) {
+            if (error) {
+                throw error; 
+            } else {
+                
+                for (let i = 0; i < payment.links.length; i++) {
+                    if (payment.links[i].rel === 'approval_url') {
+                        console.log(payment.links[i].href);
+                        
+                        return res.json({ approval_url: payment.links[i].href });
+                    }
+                }
+            }
+        });
+    });
 
-        var createDate = format(date, 'yyyymmddHHmmss');
-        var orderId = format(date, 'HHmmss');
-        var amount = req.body.amount;
-        var bankCode = 'NCB';
+    router.get('/success', (req: Request, res: Response) => {
+        const PayerID = req.query.PayerID;
+        var paymentId = req.query.paymentId;
+console.log(PayerID);
+console.log(paymentId);
+        var execute_payment_json = {
+            "payer_id": PayerID,
+            "transactions": [{
+                "amount": {
+                    "currency": "USD",
+                    "total": '10.00'
+                }
+            }]
+        };
 
-        var orderInfo = req.body.orderDescription;
-        var orderType = 'billpayment';
-        var locale = 'vn';
-        if (locale === null || locale === '') {
-            locale = 'vn';
-        }
-        var currCode = 'VND';
-        var vnp_Params: Record<string, string | number> = {};
-        vnp_Params['vnp_Version'] = '2.1.0';
-        vnp_Params['vnp_Command'] = 'pay';
-        vnp_Params['vnp_TmnCode'] = tmnCode;
-        vnp_Params['vnp_Locale'] = locale;
-        vnp_Params['vnp_CurrCode'] = currCode;
-        vnp_Params['vnp_TxnRef'] = orderId;
-        vnp_Params['vnp_OrderInfo'] = orderInfo;
-        vnp_Params['vnp_OrderType'] = orderType;
-        vnp_Params['vnp_Amount'] = amount * 100;
-        vnp_Params['vnp_ReturnUrl'] = returnUrl;
-        vnp_Params['vnp_IpAddr'] = ipAddr;
-        vnp_Params['vnp_CreateDate'] = createDate;
-        if (bankCode !== null && bankCode !== '') {
-            vnp_Params['vnp_BankCode'] = bankCode;
-        }
 
-        function sortObject(obj: Record<string, string | number>): Record<string, string | number> {
-            const sortedObj: Record<string, string | number> = {};
-            Object.keys(obj).sort().forEach(key => {
-                sortedObj[key] = obj[key];
-            });
-            return sortedObj;
-        }
+        paypal.payment.execute(paymentId, execute_payment_json, function (error: any, payment: any) {
+            if (error) {
+                console.log(error.response);
+                throw error;
+            } else {
+                console.log(JSON.stringify(payment));
+            }
+        });
+    });
 
-        vnp_Params = sortObject(vnp_Params);
-
-        var querystring = require('qs');
-        var signData = querystring.stringify(vnp_Params, { encode: false });
-        var crypto = require("crypto");
-        var hmac = crypto.createHmac("sha512", secretKey);
-        var signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex");
-        vnp_Params['vnp_SecureHash'] = signed;
-        vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
-
-        return res.json({ vnpUrl: vnpUrl })
-    })
     app.use("/api/payment", router);
 }
+

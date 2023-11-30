@@ -1,6 +1,7 @@
 import { Model, DataType, Table, Column, BelongsTo, ForeignKey, HasOne } from "sequelize-typescript";
 import { Room } from "./room"; 
 import { Receipt } from "./receipt";
+import { SchoolYear } from "./schoolyear";
 
 @Table({
     timestamps: false,
@@ -69,4 +70,14 @@ export class ElectricityAndWater extends Model {
 
     @HasOne(() => Receipt)
     receipt!: Receipt;
+
+    @ForeignKey(() => SchoolYear)
+    @Column({
+        allowNull: false
+    })
+    schoolyearId!: number;
+
+    @BelongsTo(() => SchoolYear)
+    schoolyear!: SchoolYear;
+
 }

@@ -1,11 +1,11 @@
-import { Model, DataType, Table, Column, BelongsTo, ForeignKey, BelongsToMany } from "sequelize-typescript";
+import { Model, DataType, Table, Column, BelongsTo, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
 import { Student } from "./student";
 import { Room } from "./room";
 import { ListOfDevice } from "./listofdevices";
 import { RequestList } from "./requestlist";
 
 @Table({
-    timestamps: false,
+    timestamps: true,
     tableName: "repairrequestform"
 })
 
@@ -19,10 +19,11 @@ export class RepairRequestForm extends Model {
     id!: number;
 
     @Column({
-        type: DataType.DATE,
-        allowNull: false
+        type: DataType.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     })
-    requestTime!: Date;
+    status!: boolean;
 
     @ForeignKey(() => Student)
     @Column({
@@ -33,15 +34,19 @@ export class RepairRequestForm extends Model {
     @BelongsTo(() => Student)
     student!: Student;
 
-    // @ForeignKey(() => Room)
-    // @Column({
-    //   allowNull: false
-    // })
-    // roomId!: number;    
+    @ForeignKey(() => Room)
+    @Column({
+      allowNull: false
+    })
+    roomId!: number;
 
-    // @BelongsTo(() => Room)
-    // room!: Room;
+    @BelongsTo(() => Room)
+    room!: Room;
 
-    @BelongsToMany(() => ListOfDevice, () => RequestList)
+
+     @BelongsToMany(() => ListOfDevice, () => RequestList)
     listofdevice!: ListOfDevice[];
+
+ 
+
 }

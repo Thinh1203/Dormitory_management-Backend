@@ -2,7 +2,7 @@ import { Model, DataType, Table, Column, BelongsTo, ForeignKey, HasMany } from "
 import { ElectricityAndWater } from "./electricityandwater";
 
 @Table({
-    timestamps: false,
+    timestamps: true,
     tableName: "receipts"
 })
 
@@ -35,15 +35,10 @@ export class Receipt extends Model {
 
     @Column({
         type: DataType.BOOLEAN,
-        allowNull: false
+        allowNull: false,
+        defaultValue: false
     })
     paymentStatus!: boolean;
-
-    @Column({
-        type: DataType.DATE,
-        allowNull: false
-    })
-    paymentTime!: Date;
 
     @ForeignKey(() => ElectricityAndWater)
     @Column({

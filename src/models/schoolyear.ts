@@ -1,5 +1,6 @@
 import { Model, DataType, Table, Column, BelongsTo, ForeignKey, HasMany } from "sequelize-typescript";
 import { RegistrationForm } from "./registrationform";
+import { ElectricityAndWater } from "./electricityandwater";
 
 @Table({
     timestamps: false,
@@ -29,5 +30,8 @@ export class SchoolYear extends Model {
 
     @HasMany(() => RegistrationForm)
     registrationform!: RegistrationForm[]
+
+    @HasMany(() => ElectricityAndWater)
+    electricityandwater!: ElectricityAndWater[]
 
 }

@@ -91,6 +91,10 @@ export class Room extends Model {
    @BelongsTo(() => Building)
     building!: Building;
 
+    
+    @HasMany(() => RepairRequestForm)
+    repairrequestform!: RepairRequestForm[];
+    
     @HasMany(() => RegistrationForm)
     registrationform!: RegistrationForm[]
 

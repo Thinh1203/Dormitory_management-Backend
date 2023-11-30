@@ -57,7 +57,7 @@ const db = new Sequelize(database, username, password, {
         RequestList,
         RoomStudent,
         SchoolYear,
-        RegistrationForm
+        RegistrationForm,
     ]
 });
 
