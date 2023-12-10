@@ -51,7 +51,7 @@ export const updateRoom = async (id: number, data: any) => {
 
 export const deleteRoom = async (id: number) => {
     const checkRoom = await roomRepository.findByPk(id);
-    
+
     if (!checkRoom) return BadRequestError("Room not found!");
     const result = await roomRepository.destroy({ where: { id: id } });
     return (result) ? success() : failed();
@@ -68,9 +68,9 @@ export const getOne = async (id: number): Promise<ErrorInterface | Room> => {
 
 export const getAll = async (limit: number, page: number, filter: FilterRoom | null = null, search: string | undefined = undefined) => {
     const offset = ((page ? page : 1) - 1) * limit;
-   
-  
-    
+
+
+
     const whereConditions: {
         [key: string]: any;
     } = {
@@ -80,17 +80,17 @@ export const getAll = async (limit: number, page: number, filter: FilterRoom | n
         kitchen: filter?.kitchen ? { [Op.is]: true } : undefined,
         roomCode: search !== undefined && search !== "" && search !== null ? { [Op.substring]: search } : undefined,
     };
-    
+
     const filteredWhereConditions: {
         [key: string]: any;
     } = {};
-    
+
     for (const key in whereConditions) {
         if (whereConditions[key] !== undefined) {
             filteredWhereConditions[key] = whereConditions[key];
         }
     }
-    
+
     const queryOptions: any = {
         attributes: {
             exclude: ["buildingId"]
@@ -99,7 +99,7 @@ export const getAll = async (limit: number, page: number, filter: FilterRoom | n
         offset: offset,
         limit: limit,
     };
-    
+
     if (filter?.areaCode) {
         queryOptions.include = [
             {
@@ -114,13 +114,13 @@ export const getAll = async (limit: number, page: number, filter: FilterRoom | n
             model: Building,
         };
     }
-    
+
     const { count, rows } = await roomRepository.findAndCountAll(queryOptions);
-    
+
     const last_page = Math.ceil(count / limit);
     const prev_page = page - 1 < 1 ? null : page - 1;
     const next_page = page + 1 > last_page ? null : page + 1;
-    
+
     return count > 0
         ? {
             current_page: page,
@@ -147,6 +147,22 @@ export const getAll = async (limit: number, page: number, filter: FilterRoom | n
                 };
             }),
         }
-        
+
         : BadRequestError("Room not found!");
+};
+
+export const getList = async (filter: number) => {
+
+    
+    if (filter !== 0) {
+        const res = await roomRepository.findAll({
+            where: {
+                building_id	: { [Op.eq]: filter }
+            }
+        });
+        return res ? res : BadRequestError("Not found");
+    } else {
+        const res = await roomRepository.findAll();
+        return res ? res : BadRequestError("Not found");
+    }
 };

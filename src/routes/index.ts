@@ -11,6 +11,7 @@ import { PaymentRoute } from "./payment.route";
 import { RepairRequestFormRoutes } from "./repairrequestform.route";
 import { RuleRoutes } from "./rule.route";
 import { ReceiptRoutes } from "./electricandwater.route";
+import { CheckOutRoutes } from "./checkout.route";
 export const Routes = [
     UserRoutes,
     AuthRoutes,
@@ -24,5 +25,6 @@ export const Routes = [
     PaymentRoute,
     RepairRequestFormRoutes,
     RuleRoutes,
-    ReceiptRoutes
+    ReceiptRoutes,
+    CheckOutRoutes
 ]

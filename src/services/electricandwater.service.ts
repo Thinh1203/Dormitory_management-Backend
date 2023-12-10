@@ -7,6 +7,7 @@ import { Receipt } from "../models/receipt";
 import { SchoolYear } from "../models/schoolyear";
 import { Room } from "../models/room";
 import { Building } from "../models/building";
+import { RoomStudent } from "../models/roomstudent";
 
 interface FilterReceipt {
     month?: number;
@@ -14,9 +15,19 @@ interface FilterReceipt {
     paymentStatus?: any;
     search?: string;
 }
-
+interface ReceiptData {
+    id: number;
+    totalBill: number
+}
+interface MonthEntry {
+    month: number;
+    receipt: ReceiptData[];
+    total: number;
+}
 const electricityAndWaterRepository = db.getRepository(ElectricityAndWater);
 const receiptRepository = db.getRepository(Receipt);
+const roomStudentRepository = db.getRepository(RoomStudent);
+
 
 export const addNewReceipt = async (
     month: number,
@@ -95,7 +106,8 @@ export const addNewReceipt = async (
 }
 
 export const statistical = async (schoolyearId: number) => {
-    const result = await electricityAndWaterRepository.findAll({
+
+    const results = await electricityAndWaterRepository.findAll({
         where: {
             schoolyearId: { [Op.eq]: schoolyearId }
         },
@@ -106,9 +118,33 @@ export const statistical = async (schoolyearId: number) => {
             {
                 model: SchoolYear
             }
-        ]
+        ],
+
     });
-    return result ? result : BadRequestError("Device not found!");
+    if (results && results.length > 0) {
+        const groupedData: MonthEntry[] = results.reduce((acc: MonthEntry[], item) => {
+            const month = item.month;
+            let monthEntry = acc.find(entry => entry.month === month);
+            if (!monthEntry) {
+                monthEntry = { month, receipt: [], total: 0 };
+                acc.push(monthEntry);
+            }
+
+            monthEntry.receipt.push({
+                id: item.receipt.id,
+                totalBill: item.receipt.totalBill
+            });
+            monthEntry.total += item.receipt.totalBill;
+            return acc;
+        }, []);
+        const totalAmountReceived = groupedData.reduce((total, monthEntry) => total + monthEntry.total, 0);
+
+        return {
+            groupedData,
+            totalAmountReceived
+        };
+    }
+    return BadRequestError("Not found!");
 };
 
 export const getAll = async (
@@ -262,10 +298,31 @@ export const updateOne = async (id: number, data: any) => {
     return (result[0] > 0) ? success() : failed();
 }
 
-// export const deleteOne = async (id: number) => {
-//     const check = await deviceRepository.findByPk(id);
-//     if (!check) return BadRequestError("Device not found!");
-//     const result = await deviceRepository.destroy({ where: { id } })
-//     return result ? success() : failed();
-// }
+
+export const getRoomReceipt = async (user: any, limit: number, page: number) => {
+    const result = await roomStudentRepository.findOne(
+        {
+            where:
+                { studentId: user.user_id }
+        }
+    );
+    if (result) {
+        const offset = ((page ? page : 1) - 1) * limit;
+        const { count, rows } = await electricityAndWaterRepository.findAndCountAll({
+            where: {
+                roomId: result.roomId
+            },
+            include: {
+                model: Receipt
+            },
+            order: [
+                ['id', 'DESC']
+            ],
+            offset: offset,
+            limit: limit
+        });
+        return rows ? rows : BadRequestError("Not found");
+    }
+    return BadRequestError("Not found");
+}
 

@@ -17,7 +17,8 @@ export class CheckOut extends Model {
 
     @Column({
         type: DataType.BOOLEAN,
-        allowNull: false
+        allowNull: false,
+        defaultValue: false
     })
     status!: boolean;
 

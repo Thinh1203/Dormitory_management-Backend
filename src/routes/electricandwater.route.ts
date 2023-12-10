@@ -9,10 +9,11 @@ export const ReceiptRoutes = (app: Express) => {
     router.post("/add", [auth.verifyToken(), auth.require_admin()], receipt.addNewReceipt);
     router.get("/getAll", auth.verifyToken(), receipt.getAll);
     // router.get("/getAllList", auth.verifyToken(), device.getAllList);
-    router.get("/getOne/:id", receipt.getOne);
-    router.patch("/update/:id", receipt.updateOne);
-    // router.delete("/delete/:id", [auth.verifyToken(), auth.require_admin()], device.deleteOne);
-    router.get("/statistical", receipt.statistical);
+    router.get("/getOne/:id", auth.verifyToken(), receipt.getOne);
+    router.patch("/update/:id", auth.verifyToken(), receipt.updateOne);
+
+    router.get("/getRoomReceipt", auth.verifyToken(), receipt.getRoomReceipt);
+    router.get("/statistical", [auth.verifyToken(), auth.require_admin()], receipt.statistical);
 
     app.use("/api/receipt", router);
 }

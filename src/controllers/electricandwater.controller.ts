@@ -59,6 +59,14 @@ export const updateOne = async (req: Request, res: Response, next: NextFunction)
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };
 
+export const getRoomReceipt = async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+    const { limit = 2, page = 1 } = req.query;
+    const rs = await receiptService.getRoomReceipt(user, Number(limit), Number(page));
+    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+};
+
+
 export const getOne = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const rs = await receiptService.getOne(Number(id));
@@ -67,10 +75,11 @@ export const getOne = async (req: Request, res: Response, next: NextFunction) =>
 
 export const statistical = async (req: Request, res: Response, next: NextFunction) => {
     const {
-        schoolyearId = 1,
+        schoolyearId
     } = req.query;
 
     const rs = await receiptService.statistical(Number(schoolyearId));
-    return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
+
+    return isError(rs) ? res.status(400).json("Not found") : res.status(200).json(rs);
 
 };
