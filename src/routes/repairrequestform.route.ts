@@ -10,7 +10,6 @@ export const RepairRequestFormRoutes = (app: Express) => {
     router.get("/getOne/:id", auth.verifyToken(), repairRequestForm.getOne);
     router.get("/getUserRepair", auth.verifyToken(), repairRequestForm.getUserRepair);
     router.patch("/update/:id", [auth.verifyToken(), auth.require_admin()], repairRequestForm.updateOne);
-    // router.delete("/delete/:id", registrationForm.deleteOne);
     router.get("/export",[auth.verifyToken(), auth.require_admin()], repairRequestForm.exportData );
 
     app.use("/api/repairRequestForm", router);

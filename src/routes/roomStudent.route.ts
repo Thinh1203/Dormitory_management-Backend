@@ -12,7 +12,7 @@ export const RoomStudentRoutes = (app: Express) => {
     router.patch("/update/:id", auth.verifyToken(), roomStudent.updateOne);
     router.delete("/delete/:id", [auth.verifyToken(), auth.require_admin()], roomStudent.deleteOne);
     router.get("/checkRoomUser", auth.verifyToken(), roomStudent.checkRoom);
-    // router.post("/create-payment", payment.create)
+ 
 
     app.use("/api/roomStudent", router);
 }

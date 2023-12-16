@@ -15,7 +15,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
     if (filter === '') {
         const rs = await roomStudentService.getAll(Number(limit), Number(page), null, search && String(search));
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
-    } else {        
+    } else {
         const rs = await roomStudentService.getAll(Number(limit), Number(page), filter, search && String(search));
         return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
     }
@@ -30,6 +30,7 @@ export const checkRoom = async (req: Request, res: Response, next: NextFunction)
 export const updateOne = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { paymentStatus } = req.body;
+
     const rs = await roomStudentService.updateOne(Number(id), paymentStatus);
     return isError(rs) ? next(err(rs, res)) : res.status(200).json(rs);
 };

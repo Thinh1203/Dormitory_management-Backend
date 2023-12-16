@@ -11,6 +11,7 @@ export const RoomRoutes = (app: Express) => {
     router.get("/getList",  room.getList);
     router.get("/getOne/:id", auth.verifyToken(), room.getOne);
     router.patch("/update/:id", [auth.verifyToken(), auth.require_admin()], room.updateRoom);
+    router.patch("/resetAll", [auth.verifyToken(), auth.require_admin()], room.resetAll);
     router.delete("/delete/:id", [auth.verifyToken(), auth.require_admin()], room.deleteRoom);
 
 

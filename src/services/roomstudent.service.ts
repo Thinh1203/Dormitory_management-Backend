@@ -58,10 +58,14 @@ export const checkRoom = async (user: any) => {
 }
 
 export const updateOne = async (id: number, paymentStatus: boolean) => {
-    const result = await roomStudentRepository.findByPk(id);
-    if (!result) return BadRequestError("Room not found!");
-    const update = await roomStudentRepository.update({ paymentStatus }, { where: { id } })
-    return update ? success() : failed();
+
+const result = await roomStudentRepository.findOne({
+    where: { studentId: id }
+});
+if (!result) return BadRequestError("Room not found!");
+
+const update = await roomStudentRepository.update({ paymentStatus }, { where: { studentId: id } })
+return update ? success() : failed();
 }
 
 

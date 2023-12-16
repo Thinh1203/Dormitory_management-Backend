@@ -83,3 +83,9 @@ export const statistical = async (req: Request, res: Response, next: NextFunctio
     return isError(rs) ? res.status(400).json("Not found") : res.status(200).json(rs);
 
 };
+
+export const uploadFile = async (req: Request, res: Response, next: NextFunction) => {
+    const rs = await receiptService.uploadFile(req.file);
+    return isError(rs) ? res.status(400).json("Not found") : res.status(200).json(rs);
+
+};

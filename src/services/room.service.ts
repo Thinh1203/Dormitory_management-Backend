@@ -4,6 +4,7 @@ import { failed, success } from "../utils/response";
 import { Op } from "sequelize";
 import { Room } from "../models/room";
 import { Building } from "../models/building";
+import { RoomStudent } from "../models/roomstudent";
 
 interface RoomDataType {
     roomCode: string;
@@ -16,11 +17,7 @@ interface RoomDataType {
     buildingId: number;
 }
 
-interface RoomDataTypeExtend extends RoomDataType {
-    wereThere: number;
-    empty: number;
-    status: boolean;
-}
+
 interface FilterRoom {
     areaCode?: string;
     roomMale?: string;
@@ -30,6 +27,7 @@ interface FilterRoom {
 }
 
 const roomRepository = db.getRepository(Room);
+const studentOfRoomRepository = db.getRepository(RoomStudent);
 
 export const addRoom = async ({ roomCode, roomType, roomMale, capacity, actualCapacity, kitchen, price, buildingId }: RoomDataType): Promise<ErrorInterface | Room> => {
     const checkRoom = await roomRepository.findOne({
@@ -47,6 +45,25 @@ export const updateRoom = async (id: number, data: any) => {
     if (!checkRoom) return BadRequestError("Room not found!");
     const result = await roomRepository.update(data, { where: { id: id } });
     return (result) ? success() : failed();
+}
+
+export const resetAll = async (status: boolean) => {
+    if (status) {
+        const res = await studentOfRoomRepository.destroy({
+            where: {},
+            truncate: true
+        });
+        let reset = 0;
+        const result = await roomRepository.findAll();
+        for (let i: number = 0; i < result.length; i++) {
+            const wereThere: number = 0;
+            let empty: number = result[i].actualCapacity;
+            reset++;
+            await roomRepository.update({ wereThere, empty }, { where: { id: result[i].id } });
+        }
+        return (reset > 0) ? success() : failed(); 
+    }
+    return failed();
 }
 
 export const deleteRoom = async (id: number) => {
@@ -153,11 +170,11 @@ export const getAll = async (limit: number, page: number, filter: FilterRoom | n
 
 export const getList = async (filter: number) => {
 
-    
+
     if (filter !== 0) {
         const res = await roomRepository.findAll({
             where: {
-                building_id	: { [Op.eq]: filter }
+                building_id: { [Op.eq]: filter }
             }
         });
         return res ? res : BadRequestError("Not found");

@@ -242,7 +242,9 @@ export const updateOne = async (id: number, registrationStatus: number) => {
 
 export const checkFormUser = async (user: any) => {
     const result = await registrationFormRepository.findOne({
-        where: { studentId: user.user_id }
+        where: {
+            [Op.and]: [{ studentId: user.user_id }, { registrationStatus: { [Op.not]: true } }]
+        }
     });
     if (!result) return BadRequestError("Not found!");
     const room = await roomRepository.findOne({

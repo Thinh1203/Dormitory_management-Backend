@@ -8,6 +8,7 @@ import { SchoolYear } from "../models/schoolyear";
 import { Room } from "../models/room";
 import { Building } from "../models/building";
 import { RoomStudent } from "../models/roomstudent";
+import readXlsxFile from "read-excel-file/node";
 
 interface FilterReceipt {
     month?: number;
@@ -27,7 +28,8 @@ interface MonthEntry {
 const electricityAndWaterRepository = db.getRepository(ElectricityAndWater);
 const receiptRepository = db.getRepository(Receipt);
 const roomStudentRepository = db.getRepository(RoomStudent);
-
+const roomRepository = db.getRepository(Room);
+const schoolYearRepository = db.getRepository(SchoolYear);
 
 export const addNewReceipt = async (
     month: number,
@@ -312,9 +314,14 @@ export const getRoomReceipt = async (user: any, limit: number, page: number) => 
             where: {
                 roomId: result.roomId
             },
-            include: {
-                model: Receipt
-            },
+            include: [
+                {
+                    model: Receipt
+                },
+                {
+                    model: SchoolYear
+                }
+            ],
             order: [
                 ['id', 'DESC']
             ],
@@ -325,4 +332,118 @@ export const getRoomReceipt = async (user: any, limit: number, page: number) => 
     }
     return BadRequestError("Not found");
 }
+
+export const uploadFile = async (file: any) => {
+    if (!file) {
+        return BadRequestError("Please upload an excel file!");
+    }
+
+    try {
+        const rows: any[] = await readXlsxFile(file.path);
+
+        const tutorials = rows.slice(1).map(row => {
+            return {
+                areaCode: row[0],
+                roomCode: row[1],
+                oldElectricityIndicator: row[2],
+                newElectricityIndicator: row[3],
+                oldWaterIndicator: row[4],
+                newWaterIndicator: row[5],
+                month: row[6],
+                year: row[7],
+                semester: row[8]
+            };
+        });
+
+        const result = await Promise.all(tutorials.map(async (e) => {
+            const schoolyear = await SchoolYear.findOne({
+                where: {
+                    [Op.and]: [{ year: e.year }, { semester: e.semester }]
+                }
+            });
+
+            let schoolyearId = schoolyear?.id;
+            const room = await roomRepository.findOne({
+                where: {
+                    roomCode: e.roomCode
+                },
+                include: {
+                    model: Building,
+                    where: {
+                        areaCode: e.areaCode
+                    }
+                }
+            });
+
+            let roomId = room?.id;
+            let priceElectricity: number = 0;
+            let priceWater: number = 0;
+
+
+
+            const electric: number = e.newElectricityIndicator - e.oldElectricityIndicator;
+            if (electric > 0 && electric < 51) {
+                priceElectricity = Math.floor(electric * 1728 / 1000) * 1000;
+            }
+            if (electric > 50 && electric < 101) {
+                priceElectricity = Math.floor(electric * 1786 / 1000) * 1000;
+            }
+            if (electric > 100 && electric < 201) {
+                priceElectricity = Math.floor(electric * 2074 / 1000) * 1000;
+            }
+            if (electric > 200 && electric < 301) {
+                priceElectricity = Math.floor(electric * 2612 / 1000) * 1000;
+            }
+            if (electric > 300 && electric < 401) {
+                priceElectricity = Math.floor(electric * 2919 / 1000) * 1000;
+            }
+            if (electric > 400) {
+                priceElectricity = Math.floor(electric * 3015 / 1000) * 1000;
+            }
+
+            const water: number = e.newWaterIndicator - e.oldWaterIndicator;
+            if (water > 0 && water < 11) {
+                priceWater = Math.floor(water * 5973 / 1000) * 1000;
+            }
+            if (water > 10 && water < 21) {
+                priceWater = Math.floor(water * 7052 / 1000) * 1000;
+            }
+            if (water > 20 && water < 31) {
+                priceWater = Math.floor(water * 8669 / 1000) * 1000;
+            }
+            if (water > 30) {
+                priceWater = Math.floor(water * 15929 / 1000) * 1000;
+            }
+
+            const res = await electricityAndWaterRepository.create({
+                month: e.month,
+                oldElectricityIndicator: e.oldElectricityIndicator,
+                newElectricityIndicator: e.newElectricityIndicator,
+                oldWaterIndicator: e.oldWaterIndicator,
+                newWaterIndicator: e.newWaterIndicator,
+                roomId: roomId,
+                schoolyearId: schoolyearId,
+                electricityPrice: priceElectricity,
+                waterPrice: priceWater,
+            });
+
+            if (res?.id > 0) {
+                const totalPrice: number = res.electricityPrice + res.waterPrice;
+                await receiptRepository.create({
+                    ElectricityAndWaterId: res.id,
+                    totalBill: totalPrice,
+                    totalWaterBill: res.waterPrice,
+                    totalElectricityBill: res.electricityPrice
+                });
+            }
+
+            return 1;
+        }));
+
+        return result.every(r => r === 1) ? success() : failed();
+    } catch (error) {
+        console.error('Error reading Excel file:', error);
+        throw error;
+    }
+};
 
